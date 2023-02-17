@@ -1,29 +1,102 @@
-function findElementById(id) {
+export function findElementById(id) {
     // Return the element in the DOM with corresponding `id`
 
-    // Your code here
+    // Your code here        
+    let check = function (el) { 
+        return checkById(el, id) 
+    }
+    return deepTraverseSearch(document, check, "first");
 }
 
-function findFirstElementOfTag(tag) {
+export function findFirstElementOfTag(tag) {
     // Return the first occurence of an element of tag name `tag`
 
-    // Your code here
+    // Your code here       
+    let check = function (el) { 
+        return checkByTag(el, tag) 
+    }
+    return deepTraverseSearch(document, check, "first");
+
 }
 
-function findFirstElementOfClass(cls) {
+export function findFirstElementOfClass(cls) {
     // Return the first occurence of an element of class `cls`
 
     // Your code here
+           
+    let check = function (el) { 
+        return checkByClass(el, cls) 
+    }
+    return deepTraverseSearch(document, check, "first");
 }
 
-function findElementsOfTag(tag) {
+export function findElementsOfTag(tag) {
     // Return an array of elements that have a tag name of `tag`
 
     // Your code here
+    let check = function (el) { 
+        return checkByTag(el, tag) 
+    }
+    return deepTraverseSearch(document, check, "all");
 }
 
-function findElementsOfClass(cls) {
+export function findElementsOfClass(cls) {
     // Return an array of elements that have are of class `cls`
 
-    // Your code here
+    // Your code here       
+    let check = function (el) { 
+        return checkByClass(el, cls) 
+    }
+    return deepTraverseSearch(document, check, "all");
+}
+
+function deepTraverseSearch(doc, check, mode) {
+            //console.log('starting deepSearch, doc, check, mode:\n\n', doc + "\n\n" + check + "\n\n" + mode + "\n\n\n");
+    // doc = window.document as nested array =tree to search in
+    // check - function (element) with search criteria
+    // mode = 'first' or 'all'
+                 //console.log('doc to search:', doc);
+    const stack = []
+    const found = []
+    // Put the starting node on a stack
+    let root = doc.children[0]
+    stack.push(root); // Doc only 1 children = HTML   
+    // While the stack is not empty
+    while (stack.length > 0) {
+
+        // Pop a node and check it, store if ok
+        let node = stack.pop();
+        let checkResult = check(node)
+
+        if (checkResult) {            
+            if (mode === 'first') {
+                return node;
+            } else if (mode === 'all') {
+                found.push(node)
+            } else {
+                console.log("wrong check 3rd parameter, need mode ='first' or 'all'")
+            }
+        }
+
+
+        // Put all of the node's children on the top of the stack
+        // doing this from last branch to first for scanning up to down
+        for (let i = node.children.length - 1; i >=0; i--) {                 
+            stack.push(node.children[i]);         
+        }
+    }
+
+    return found // array of searched elements;
+}
+
+// checking functions:
+
+function checkById(el, id) {
+    return el.id === id;
+}
+function checkByTag(el, tag) {
+    return el.tagName === tag;
+}
+function checkByClass(el, cls) {
+     return el.classList.contains(cls);
 }
